@@ -20,6 +20,7 @@ class Patron:
         pygame.draw.circle(screen, 'red', (self.x, self.y), 5)
         self.move()
 
+
 class Enemy:
     def __init__(self, speed):
         self.r = random.randint(30, width - 30)
@@ -37,7 +38,7 @@ class Enemy:
 class Hero:
     def __init__(self, speed):
         self.x = width // 2
-        self.y =height - 50
+        self.y = height - 50
         self.speed = speed
 
     def render(self, screen):
@@ -51,11 +52,10 @@ class Hero:
         self.x += self.speed
 
 
-
 class Timer:
     def __init__(self, time):
         self.timing = time
-        self.interval = dt.timedelta(seconds=3)
+        self.interval = dt.timedelta(seconds=1)
 
     def run(self):
         now = dt.datetime.now()
@@ -102,7 +102,7 @@ if __name__ == '__main__':
                 player.move_right()
             if event.type == pygame.MOUSEBUTTONDOWN and game_started:
                 player_shot = True
-                p = Patron(player.x,player.y,speed_of_patron)
+                p = Patron(player.x, player.y, speed_of_patron)
                 patrons.append(p)
             if event.type == enemy and game_started:
                 screen.fill((100, 149, 237))
@@ -115,7 +115,10 @@ if __name__ == '__main__':
                         p.render_shot()
                         if p.y <= - 20:
                             patrons.remove(p)
-
+                        for e in enemies:
+                            if p.y - 5 <= e.y + 25 and p.y - 5 >= e.y - 25 and p.x + 5 >= e.x - 25 and p.x + 5 <= e.x + 25:
+                                enemies.remove(e)
+                                patrons.remove(p)
                 player.render(screen)
         if game_timer != None:
             if game_timer.run():
