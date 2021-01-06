@@ -48,7 +48,7 @@ class Enemy:
         self.speed = speed
         self.max_health = 100
         self.health = 100
-        self.damage = 300
+        self.damage = 250
 
     def render(self, screen):
         pygame.draw.circle(screen, (128, 0, 128), (self.x, self.y), 25)
@@ -85,9 +85,10 @@ class Hero:
 
 
 class Timer:
-    def __init__(self, time):
+    def __init__(self, time, gap):
         self.timing = time
-        self.interval = dt.timedelta(seconds=1)
+        self.gap = gap
+        self.interval = dt.timedelta(seconds=self.gap)
 
     def run(self):
         now = dt.datetime.now()
@@ -102,24 +103,31 @@ if __name__ == '__main__':
     pygame.display.set_caption('Игра')
     size = width, height = 800, 800
     screen = pygame.display.set_mode(size)
-    running = True
-    enemy_is_spoted = False
-    game_started = False
-    game_timer = None
+
     enemies = []
     patrons = []
+
     enemy = pygame.USEREVENT + 1
     pygame.time.set_timer(enemy, 10)
     clock = pygame.time.Clock()
     hero = pygame.USEREVENT + 1
     pygame.time.set_timer(hero, 10)
-    speed_of_enemy = 2
-    speed_of_player = 3
-    speed_of_patron = 5
+
+    running = True
+    enemy_is_spoted = False
+    game_started = False
+    game_timer = None
     player_shot = False
     player = None
     home = None
     game_ended = False
+
+    speed_of_enemy = 0.5
+    speed_of_player = 3
+    speed_of_patron = 5
+    kills = 0
+    enemy_spot_speed = 3.5
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -127,7 +135,7 @@ if __name__ == '__main__':
             if event.type == pygame.MOUSEBUTTONDOWN and not game_started:
                 print('Игра началась')
                 game_started = True
-                game_timer = Timer(dt.datetime.now())
+                game_timer = Timer(dt.datetime.now(), enemy_spot_speed)
                 player = Hero(speed_of_player)
                 home = HomeTown()
 
@@ -149,9 +157,9 @@ if __name__ == '__main__':
                     if en.y >= 770:
                         home.health -= en.damage
                         enemies.remove(en)
-                        print(home.health)
+
                     en.render(screen)
-                    home.render(screen)
+
                     if home.health <= 0:
                         print('Вы проиграли')
                         game_ended = True
@@ -168,18 +176,26 @@ if __name__ == '__main__':
                             if e.y - 25 <= p.y - 5 <= e.y + 25 and e.x - 25 <= p.x + 5 <= e.x + 25:
 
                                 e.health -= p.damage
-                                print(e.health)
+
                                 patrons.remove(p)
                                 if e.health <= 0:
+                                    # print('Убит')
+                                    kills += 1
                                     enemies.remove(e)
-
+                                    if kills % 5 == 0:
+                                        enemy_spot_speed -= 0.5
+                                        speed_of_enemy += 0.5
+                                        game_timer = Timer(dt.datetime.now(), enemy_spot_speed)
+                                        print('Уровень пройден')
+                                    print(kills)
+                home.render(screen)
                 player.render(screen)
         if game_timer != None and game_started:
             if game_timer.run():
-                print('Создаю врага')
+                # print('Создаю врага')
                 a = Enemy(speed_of_enemy)
                 enemies.append(a)
-                print(len(enemies))
+
         for en in enemies:
             if en.y >= height + 20:
                 enemies.remove(en)
@@ -189,5 +205,10 @@ if __name__ == '__main__':
             patrons = []
             enemies = []
             game_ended = False
+            speed_of_enemy = 0.5
+            speed_of_player = 3
+            speed_of_patron = 5
+            kills = 0
+            enemy_spot_speed = 3.5
 
     pygame.quit()
