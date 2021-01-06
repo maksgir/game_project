@@ -119,7 +119,7 @@ if __name__ == '__main__':
     player_shot = False
     player = None
     home = None
-
+    game_ended = False
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -154,7 +154,9 @@ if __name__ == '__main__':
                     home.render(screen)
                     if home.health <= 0:
                         print('Вы проиграли')
+                        game_ended = True
                         game_started = False
+
             if event.type == hero and game_started:
                 if player_shot:
                     for p in patrons:
@@ -183,5 +185,9 @@ if __name__ == '__main__':
                 enemies.remove(en)
 
         pygame.display.flip()
+        if game_ended:
+            patrons = []
+            enemies = []
+            game_ended = False
 
     pygame.quit()
