@@ -12,6 +12,7 @@ class Patron:
         self.x = x
         self.y = y
         self.speed = speed
+        self.damage = 20
 
     def move(self):
         self.y -= self.speed
@@ -27,9 +28,19 @@ class Enemy:
         self.x = self.r
         self.y = 0
         self.speed = speed
+        self.max_health = 100
+        self.health = 100
 
     def render(self, screen):
         pygame.draw.circle(screen, (47, 79, 79), (self.x, self.y), 25)
+        len_x = 100
+        len_y = 10
+        x = self.x - len_x // 2
+        y = self.y - 50
+        pygame.draw.rect(screen, (0, 0, 0), ((x, y), (len_x, len_y)), 2)
+        pygame.draw.rect(screen, (255, 255, 255), ((x, y), (len_x, len_y)))
+        new_x = self.health / self.max_health * len_x
+        pygame.draw.rect(screen, (0, 255, 0), ((x, y), (new_x, len_y)))
 
     def move(self):
         self.y += self.speed
@@ -55,7 +66,7 @@ class Hero:
 class Timer:
     def __init__(self, time):
         self.timing = time
-        self.interval = dt.timedelta(seconds=1)
+        self.interval = dt.timedelta(seconds=3)
 
     def run(self):
         now = dt.datetime.now()
@@ -115,10 +126,16 @@ if __name__ == '__main__':
                         p.render_shot()
                         if p.y <= - 20:
                             patrons.remove(p)
+
                         for e in enemies:
                             if e.y - 25 <= p.y - 5 <= e.y + 25 and e.x - 25 <= p.x + 5 <= e.x + 25:
-                                enemies.remove(e)
+
+                                e.health -= p.damage
+                                print(e.health)
                                 patrons.remove(p)
+                                if e.health <= 0:
+                                    enemies.remove(e)
+
                 player.render(screen)
         if game_timer != None:
             if game_timer.run():
