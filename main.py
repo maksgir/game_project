@@ -4,25 +4,41 @@ import sys
 import random
 import datetime as dt
 
+width, height = 800, 800
+
 
 class Enemy:
     def __init__(self, speed):
-        self.r = random.randint(10, 790)
+        self.r = random.randint(30, width - 30)
         self.x = self.r
         self.y = 0
         self.speed = speed
 
     def render(self, screen):
-        pygame.draw.circle(screen, 'black', (self.x, self.y), 5)
+        pygame.draw.circle(screen, (47, 79, 79), (self.x, self.y), 25)
 
     def move(self):
         self.y += self.speed
 
 
+class Hero:
+    def __init__(self, speed):
+        self.x = width // 2
+        self.y = height - 50
+        self.speed = speed
+
+    def render(self, screen):
+        pygame.draw.rect(screen, (0, 0, 205), ((self.x - 60, self.y), (120, 18)))
+        pygame.draw.rect(screen, (0, 0, 0), ((self.x - 5, self.y - 10), (10, 10)))
+    def move_left(self):
+        self.x -= self.speed
+    def move_right(self):
+        self.x += self.speed
+
 class Timer:
     def __init__(self, time):
         self.timing = time
-        self.interval = dt.timedelta(seconds=1)
+        self.interval = dt.timedelta(seconds=3)
 
     def run(self):
         now = dt.datetime.now()
@@ -45,7 +61,11 @@ if __name__ == '__main__':
     enemy = pygame.USEREVENT + 1
     pygame.time.set_timer(enemy, 10)
     clock = pygame.time.Clock()
-    speed = 2
+    hero = pygame.USEREVENT + 1
+    pygame.time.set_timer(hero, 10)
+    speed_of_enemy = 1
+    speed_of_player = 3
+    player = None
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -54,17 +74,22 @@ if __name__ == '__main__':
                 print('Игра началась')
                 game_started = True
                 game_timer = Timer(dt.datetime.now())
-                print(dt.datetime.now())
+                player = Hero(speed_of_player)
+            if pygame.key.get_pressed()[pygame.K_a] or pygame.key.get_pressed()[pygame.K_LEFT]:
+                player.move_left()
+            if pygame.key.get_pressed()[pygame.K_d] or pygame.key.get_pressed()[pygame.K_RIGHT]:
+                player.move_right()
             if event.type == enemy and game_started:
                 screen.fill((100, 149, 237))
                 for en in enemies:
                     en.move()
-                    pygame.draw.circle(screen, 'black', (en.x, en.y), 15)
-
+                    en.render(screen)
+            if event.type == hero and game_started:
+                player.render(screen)
         if game_timer != None:
             if game_timer.run():
                 print('Создаю врага')
-                a = Enemy(speed)
+                a = Enemy(speed_of_enemy)
                 enemies.append(a)
                 print(len(enemies))
         for en in enemies:
