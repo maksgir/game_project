@@ -7,6 +7,19 @@ import datetime as dt
 width, height = 800, 800
 
 
+class Patron:
+    def __init__(self, x, y, speed):
+        self.x = x
+        self.y = y
+        self.speed = speed
+
+    def move(self):
+        self.y -= self.speed
+
+    def render_shot(self):
+        pygame.draw.circle(screen, 'red', (self.x, self.y), 5)
+        self.move()
+
 class Enemy:
     def __init__(self, speed):
         self.r = random.randint(30, width - 30)
@@ -24,16 +37,20 @@ class Enemy:
 class Hero:
     def __init__(self, speed):
         self.x = width // 2
-        self.y = height - 50
+        self.y =height - 50
         self.speed = speed
 
     def render(self, screen):
         pygame.draw.rect(screen, (0, 0, 205), ((self.x - 60, self.y), (120, 18)))
         pygame.draw.rect(screen, (0, 0, 0), ((self.x - 5, self.y - 10), (10, 10)))
+
     def move_left(self):
         self.x -= self.speed
+
     def move_right(self):
         self.x += self.speed
+
+
 
 class Timer:
     def __init__(self, time):
@@ -58,6 +75,7 @@ if __name__ == '__main__':
     game_started = False
     game_timer = None
     enemies = []
+    patrons = []
     enemy = pygame.USEREVENT + 1
     pygame.time.set_timer(enemy, 10)
     clock = pygame.time.Clock()
@@ -65,6 +83,8 @@ if __name__ == '__main__':
     pygame.time.set_timer(hero, 10)
     speed_of_enemy = 1
     speed_of_player = 3
+    speed_of_patron = 5
+    player_shot = False
     player = None
     while running:
         for event in pygame.event.get():
@@ -77,14 +97,25 @@ if __name__ == '__main__':
                 player = Hero(speed_of_player)
             if pygame.key.get_pressed()[pygame.K_a] or pygame.key.get_pressed()[pygame.K_LEFT]:
                 player.move_left()
+
             if pygame.key.get_pressed()[pygame.K_d] or pygame.key.get_pressed()[pygame.K_RIGHT]:
                 player.move_right()
+            if event.type == pygame.MOUSEBUTTONDOWN and game_started:
+                player_shot = True
+                p = Patron(player.x,player.y,speed_of_patron)
+                patrons.append(p)
             if event.type == enemy and game_started:
                 screen.fill((100, 149, 237))
                 for en in enemies:
                     en.move()
                     en.render(screen)
             if event.type == hero and game_started:
+                if player_shot:
+                    for p in patrons:
+                        p.render_shot()
+                        if p.y <= - 20:
+                            patrons.remove(p)
+
                 player.render(screen)
         if game_timer != None:
             if game_timer.run():
