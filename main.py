@@ -116,7 +116,7 @@ if __name__ == '__main__':
                         if p.y <= - 20:
                             patrons.remove(p)
                         for e in enemies:
-                            if p.y - 5 <= e.y + 25 and p.y - 5 >= e.y - 25 and p.x + 5 >= e.x - 25 and p.x + 5 <= e.x + 25:
+                            if e.y - 25 <= p.y - 5 <= e.y + 25 and e.x - 25 <= p.x + 5 <= e.x + 25:
                                 enemies.remove(e)
                                 patrons.remove(p)
                 player.render(screen)
