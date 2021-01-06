@@ -7,6 +7,24 @@ import datetime as dt
 width, height = 800, 800
 
 
+class HomeTown:
+    def __init__(self):
+        self.health = 1000
+        self.x = 0
+        self.y = 770
+        self.max_health = 1000
+
+    def render(self, screen):
+        x = self.x
+        y = self.y
+        len_x = 800
+        len_y = 8
+        pygame.draw.rect(screen, (255, 255, 255), ((x, y), (len_x, len_y)))
+        new_x = self.health / self.max_health * len_x
+        if self.health > 0:
+            pygame.draw.rect(screen, (0, 255, 0), ((x, y), (new_x, len_y)))
+
+
 class Patron:
     def __init__(self, x, y, speed):
         self.x = x
@@ -30,9 +48,10 @@ class Enemy:
         self.speed = speed
         self.max_health = 100
         self.health = 100
+        self.damage = 300
 
     def render(self, screen):
-        pygame.draw.circle(screen, (47, 79, 79), (self.x, self.y), 25)
+        pygame.draw.circle(screen, (128, 0, 128), (self.x, self.y), 25)
         len_x = 100
         len_y = 10
         x = self.x - len_x // 2
@@ -53,20 +72,22 @@ class Hero:
         self.speed = speed
 
     def render(self, screen):
-        pygame.draw.rect(screen, (0, 0, 205), ((self.x - 60, self.y), (120, 18)))
-        pygame.draw.rect(screen, (0, 0, 0), ((self.x - 5, self.y - 10), (10, 10)))
+        pygame.draw.rect(screen, (255, 0, 0), ((self.x - 40, self.y), (80, 18)))
+        pygame.draw.rect(screen, (128, 0, 0), ((self.x - 5, self.y - 10), (10, 10)))
 
     def move_left(self):
-        self.x -= self.speed
+        if self.x - 40 > 0:
+            self.x -= self.speed
 
     def move_right(self):
-        self.x += self.speed
+        if self.x + 40 < 800:
+            self.x += self.speed
 
 
 class Timer:
     def __init__(self, time):
         self.timing = time
-        self.interval = dt.timedelta(seconds=3)
+        self.interval = dt.timedelta(seconds=1)
 
     def run(self):
         now = dt.datetime.now()
@@ -92,11 +113,13 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     hero = pygame.USEREVENT + 1
     pygame.time.set_timer(hero, 10)
-    speed_of_enemy = 1
+    speed_of_enemy = 2
     speed_of_player = 3
     speed_of_patron = 5
     player_shot = False
     player = None
+    home = None
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -106,6 +129,8 @@ if __name__ == '__main__':
                 game_started = True
                 game_timer = Timer(dt.datetime.now())
                 player = Hero(speed_of_player)
+                home = HomeTown()
+
             if pygame.key.get_pressed()[pygame.K_a] or pygame.key.get_pressed()[pygame.K_LEFT]:
                 player.move_left()
 
@@ -116,10 +141,20 @@ if __name__ == '__main__':
                 p = Patron(player.x, player.y, speed_of_patron)
                 patrons.append(p)
             if event.type == enemy and game_started:
-                screen.fill((100, 149, 237))
+                screen.fill((0, 0, 0))
+
                 for en in enemies:
                     en.move()
+
+                    if en.y >= 770:
+                        home.health -= en.damage
+                        enemies.remove(en)
+                        print(home.health)
                     en.render(screen)
+                    home.render(screen)
+                    if home.health <= 0:
+                        print('Вы проиграли')
+                        game_started = False
             if event.type == hero and game_started:
                 if player_shot:
                     for p in patrons:
@@ -137,7 +172,7 @@ if __name__ == '__main__':
                                     enemies.remove(e)
 
                 player.render(screen)
-        if game_timer != None:
+        if game_timer != None and game_started:
             if game_timer.run():
                 print('Создаю врага')
                 a = Enemy(speed_of_enemy)
