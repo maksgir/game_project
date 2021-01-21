@@ -93,7 +93,7 @@ def start_screen():
 
             if event.type == pygame.MOUSEBUTTONDOWN and name_is_shown and menu_is_shown:
                 x, y = event.pos
-                print(x, y)
+
                 if 285 <= x <= 471 and 459 <= y <= 525:
                     settings_are_shown = True
                     menu_is_shown = False
@@ -106,15 +106,14 @@ def start_screen():
                 x, y = event.pos
 
                 if 216 <= x <= 310 and 222 <= y <= 256:
-                    print('menu')
                     menu_is_shown = True
                     settings_are_shown = False
 
             if event.type == pygame.MOUSEBUTTONDOWN and game_options:
                 x, y = event.pos
-                print(x, y)
+
                 if 216 <= x <= 310 and 222 <= y <= 256:
-                    print('menu')
+
                     menu_is_shown = True
                     game_options = False
                 elif 313 <= x <= 449 and 412 <= y <= 448:
@@ -455,7 +454,7 @@ if __name__ == '__main__':
                     x, y = pygame.mouse.get_pos()
                     if 203 <= x <= 326 and 380 <= y <= 419:
                         pygame.draw.line(screen, (255, 0, 0), (203, 419), (326, 419), 5)
-                    elif 362 <= x <= 588 and 474 <=y <=  506:
+                    elif 362 <= x <= 588 and 474 <= y <= 506:
                         pygame.draw.line(screen, (255, 0, 0), (362, 506), (588, 506), 5)
             if lose and event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
