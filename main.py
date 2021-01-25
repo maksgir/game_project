@@ -130,9 +130,7 @@ def start_screen():
                     name_x += 10
                 else:
                     name_is_shown = True
-                if name_is_shown and (menu_is_shown or settings_are_shown or game_options):
-                    ghosts.draw(screen)
-                    ghosts.update()
+
                 if settings_are_shown:
                     settings_render()
                     x, y = pygame.mouse.get_pos()
@@ -151,7 +149,9 @@ def start_screen():
                         pygame.draw.line(screen, (0, 255, 0), (313, 518), (449, 518), 5)
                     elif 313 <= x <= 449 and 557 <= y <= 584:
                         pygame.draw.line(screen, (0, 255, 0), (313, 584), (463, 584), 5)
-
+                if name_is_shown and (menu_is_shown or settings_are_shown or game_options):
+                    ghosts.draw(screen)
+                    ghosts.update()
             if event.type == menu_mov and name_is_shown and not settings_are_shown and not game_options:
 
                 menu_pic_render(menu_x, menu_y)
@@ -285,6 +285,11 @@ def lose_render():
     screen.blit(image, (180, 200))
 
 
+def back_render():
+    image = load_image('back.png')
+    screen.blit(image, (0, 0))
+
+
 if __name__ == '__main__':
 
     pygame.init()
@@ -339,7 +344,6 @@ if __name__ == '__main__':
 
     kills = 0
     enemies_last = 50
-    print(speed_of_enemy)
     game_started = True
     game_timer = Timer(dt.datetime.now(), enemy_spot_speed)
     player = Hero(speed_of_player)
@@ -379,12 +383,15 @@ if __name__ == '__main__':
             if pygame.key.get_pressed()[pygame.K_d] or pygame.key.get_pressed()[pygame.K_RIGHT]:
                 player.move_right()
 
-            if event.type == pygame.MOUSEBUTTONDOWN and game_started:
+            if (event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) \
+                    and game_started:
+
                 player_shot = True
                 fire_render(player.x - 17, player.y - 26)
                 p = Patron(player.x, player.y, speed_of_patron, player_damage)
 
                 patrons.append(p)
+
             if event.type == enemy and game_started:
                 screen.fill((42, 42, 42))
                 for en in enemies:
@@ -400,7 +407,19 @@ if __name__ == '__main__':
                         lose = True
                         game_ended = True
                         game_started = False
-
+            if event.type == pygame.MOUSEBUTTONDOWN and game_started:
+                x, y = event.pos
+                if 41 <= x <= 143 and 22 <= y <= 47:
+                    lvl = start_screen()
+                    game_ended = False
+                    lose = False
+                    game_started = True
+                    kills = 0
+                    enemies_last = 50
+                    patrons = []
+                    enemies = []
+                    player = Hero(speed_of_player)
+                    home = HomeTown()
             if event.type == hero and game_started:
                 if player_shot:
                     for p in patrons:
@@ -427,11 +446,13 @@ if __name__ == '__main__':
                                         game_started = False
                                         game_ended = True
                                         victory = True
+
                 font = pygame.font.Font(None, 35)
                 lvl_text = font.render(f'Уровень: {lvl}', True, (100, 255, 100))
                 en_last = font.render(f'Призраков осталось: {str(enemies_last)}', True, (100, 255, 100))
                 kills_text = font.render(f'Убийств: {str(kills)}', True, (100, 255, 100))
                 home_xp = font.render(f'ХП: {str(home.health)}', True, (100, 255, 100))
+                back_render()
                 screen.blit(home_xp, (650, 700))
                 screen.blit(kills_text, (600, 90))
                 screen.blit(lvl_text, (550, 10))
@@ -468,6 +489,8 @@ if __name__ == '__main__':
                     enemies_last = 50
                     patrons = []
                     enemies = []
+                    player = Hero(speed_of_player)
+                    home = HomeTown()
                 elif 362 <= x <= 588 and 474 <= 506:
                     game_ended = False
                     lose = False
@@ -490,7 +513,8 @@ if __name__ == '__main__':
                     enemies_last = 50
                     patrons = []
                     enemies = []
-
+                    player = Hero(speed_of_player)
+                    home = HomeTown()
                 elif 322 <= x <= 567 and 493 <= y <= 521:
                     game_ended = False
                     victory = False
