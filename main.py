@@ -348,7 +348,7 @@ if __name__ == '__main__':
     game_timer = Timer(dt.datetime.now(), enemy_spot_speed)
     player = Hero(speed_of_player)
     home = HomeTown()
-
+    f = 0
     while running:
         if lvl == 'simple' or lvl == 'Лёгкий':
             lvl = 'Лёгкий'
@@ -358,6 +358,9 @@ if __name__ == '__main__':
             enemy_xp = 100
             enemy_damage = 100
             player_damage = 50
+            if f == 0:
+                enemies_last = 10
+                f = 1
         elif lvl == 'medium' or lvl == 'Средний':
             lvl = 'Средний'
             speed_of_enemy = 1
@@ -366,6 +369,9 @@ if __name__ == '__main__':
             enemy_xp = 100
             enemy_damage = 250
             player_damage = 34
+            if f == 0:
+                enemies_last = 35
+                f = 1
         elif lvl == 'hard' or lvl == 'Сложный':
             lvl = 'Сложный'
             speed_of_enemy = 1.25
@@ -374,6 +380,9 @@ if __name__ == '__main__':
             enemy_xp = 100
             enemy_damage = 340
             player_damage = 25
+            if f == 0:
+                enemies_last = 50
+                f = 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -385,7 +394,6 @@ if __name__ == '__main__':
 
             if (event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) \
                     and game_started:
-
                 player_shot = True
                 fire_render(player.x - 17, player.y - 26)
                 p = Patron(player.x, player.y, speed_of_patron, player_damage)
@@ -415,12 +423,13 @@ if __name__ == '__main__':
                     lose = False
                     game_started = True
                     kills = 0
-                    enemies_last = 50
+                    f = 0
                     patrons = []
                     enemies = []
                     player = Hero(speed_of_player)
                     home = HomeTown()
             if event.type == hero and game_started:
+
                 if player_shot:
                     for p in patrons:
                         p.render_shot()
@@ -457,7 +466,10 @@ if __name__ == '__main__':
                 screen.blit(kills_text, (600, 90))
                 screen.blit(lvl_text, (550, 10))
                 screen.blit(en_last, (500, 50))
-
+                x, y = pygame.mouse.get_pos()
+                if 41 <= x <= 143 and 22 <= y <= 47:
+                    pygame.draw.line(screen, (0, 255, 0), (23, 33), (83, 5),  5)
+                    pygame.draw.line(screen, (0, 255, 0), (23, 33), (83, 61), 5)
                 home.render(screen)
                 player.render(screen)
 
@@ -486,7 +498,7 @@ if __name__ == '__main__':
                     lose = False
                     game_started = True
                     kills = 0
-                    enemies_last = 50
+                    f = 0
                     patrons = []
                     enemies = []
                     player = Hero(speed_of_player)
@@ -496,21 +508,21 @@ if __name__ == '__main__':
                     lose = False
                     game_started = True
                     kills = 0
-                    enemies_last = 50
+                    f = 0
                     patrons = []
                     enemies = []
                     player = Hero(speed_of_player)
                     home = HomeTown()
             if victory and event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
-                print(x, y)
+
                 if 217 <= x <= 408 and 331 <= y <= 360:
                     lvl = start_screen()
                     game_ended = False
                     victory = False
                     game_started = True
                     kills = 0
-                    enemies_last = 50
+                    f = 0
                     patrons = []
                     enemies = []
                     player = Hero(speed_of_player)
@@ -520,7 +532,7 @@ if __name__ == '__main__':
                     victory = False
                     game_started = True
                     kills = 0
-                    enemies_last = 50
+                    f = 0
                     patrons = []
                     enemies = []
                     player = Hero(speed_of_player)
